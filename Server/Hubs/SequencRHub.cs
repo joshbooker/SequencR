@@ -12,7 +12,7 @@ namespace SequencR.Server.Hubs
         public int CurrentStep { get; set; } = 0;
         public bool IsRunning { get; set; } = false;
 
-        public async Task StartAsync()
+        public async Task StartSequencerAsync()
         {
             await Clients.All.SendAsync("Started");
             IsRunning = true;
@@ -25,7 +25,7 @@ namespace SequencR.Server.Hubs
             }
         }
 
-        public async Task StopAsync()
+        public async Task StopSequencerAsync()
         {
             IsRunning = false;
             CurrentStep = 0;
