@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SequencR.Server.Hubs;
 using System.Linq;
 
 namespace SequencR.Server
@@ -13,6 +14,8 @@ namespace SequencR.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc();
+            services.AddSignalR();
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -38,6 +41,8 @@ namespace SequencR.Server
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapDefaultControllerRoute();
+                endpoints.MapHub<SequencRHub>("/sequencrHub");
                 endpoints.MapFallbackToClientSideBlazor<Client.Program>("index.html");
             });
         }

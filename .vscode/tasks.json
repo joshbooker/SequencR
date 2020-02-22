@@ -38,6 +38,17 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "touch",
+            "command": "touch",
+            "type": "process",
+            "isBackground": false,
+            "promptOnClose": false,
+            "args": [
+                "${workspaceFolder}/Server/Startup.cs"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

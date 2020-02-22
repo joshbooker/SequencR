@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
 <div class="card-group">
@@ -13,17 +15,17 @@
             <input type="text" class="dial" value="@BPM" data-min="50" data-max="200" data-width="120" data-thickness=".1">
         </div>
         <li class="list-group-item">
-            <button type="button" class="btn btn-success">Start</button>
+            <button type="button" class="btn btn-success" @onclick="Start">Start</button>
         </li>
         <li class="list-group-item">
-            <button type="button" class="btn btn-danger">Stop</button>
+            <button type="button" class="btn btn-danger" @onclick="Stop">Stop</button>
         </li>
     </div>
 @for (int step = 0; step < 9; step++)
 {
     if(step > 0)
     {
-        <div class="card text-center">
+        <div class="card text-center" data-step="@step">
             <div class="card-header">
                 @step
             </div>
@@ -55,12 +57,15 @@
     }
 }
 </div>
-
+@uri
 @code {
     int BPM = 120;
+    int CurrentStep = 0;
     string[] pads = { 
         "Bass", "Snare", "Hi Tom", "Mid Tom", "Low Tom", "Closed Hat", "Open Hat", "Clap"
     };
+    HubConnection hubConnection;
+    string uri;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -72,6 +77,32 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+        uri = NavigationManager.ToAbsoluteUri("/sequencrHub").ToString();
+
+        hubConnection = new HubConnectionBuilder()  
+            .WithUrl(new Uri(uri))
+            .Build();
+
+/*
+        hubConnection.On<int>("MovedToStep", 
+            async (step) =>
+            {
+                CurrentStep = step;
+                await JSRuntime.InvokeVoidAsync("moveToStep", CurrentStep);
+                StateHasChanged();
+            });
+*/ 
+
+        //await hubConnection.StartAsync();
+    }
+
+    protected async Task Start()
+    {
+        //await hubConnection.SendAsync("Start");
+    }
+
+    protected async Task Stop()
+    {
+        //await hubConnection.SendAsync("Stop");
     }
 }

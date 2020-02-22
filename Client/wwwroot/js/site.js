@@ -7,3 +7,7 @@ function init(val) {
          }
     });
 }
+
+function moveToStep(step) {
+    console.log('moveToStep ' + step);
+}
