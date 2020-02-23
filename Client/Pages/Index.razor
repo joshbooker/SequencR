@@ -90,13 +90,6 @@
 
     DotNetObjectReference<BpmHelper> dotNetObject;
 
-    protected Task ChangeBpm()
-    {
-        dotNetObject.Value.LogBpm(BPM);
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
     protected async Task Start()
     {
         await hubConnection.SendAsync("StartSequencerAsync");
