@@ -1,0 +1,137 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="main">
+    <div class="top-row px-4">
+        <strong>SequencR</strong>
+        <span style="padding-left: 10px;">@connectionState</span>
+        <span style="padding-left: 10px;">@CurrentStep</span>
+    </div>
+
+    <div class="content">
+        <div class="card-group">
+            <div class="card text-center card-controls">
+                <div class="card-header">
+                    Controls
+                </div>
+                <li class="list-group-item">
+                    BPM
+                </li>
+                <div class="card-body">
+                    <input type="text" class="dial" value="@BPM" data-min="50" data-max="200" data-width="120" data-thickness=".1">
+                </div>
+                <li class="list-group-item">
+                    <button type="button" class="btn btn-success" @onclick="Start">Start</button>
+                </li>
+                <li class="list-group-item">
+                    <button type="button" class="btn btn-danger" @onclick="Stop">Stop</button>
+                </li>
+            </div>
+        @for (int step = 0; step < 9; step++)
+        {
+            if(step > 0)
+            {
+                <div class="card text-center" data-step="@step">
+                    <div class="card-header">
+                        @step
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var pad in pads)
+                        {
+                            <li class="list-group-item">
+                                <button type="button" class="btn btn-secondary">Off</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="card text-center">
+                    <div class="card-header">
+                        Instruments
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var pad in pads)
+                        {
+                            <li class="list-group-item">
+                                <button type="button" class="btn btn-secondary btn-instrument">@pad</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+        </div>
+    </div>
+</div>
+
+@code {
+    HubConnection hubConnection;
+    string connectionState = "Disconnected";
+    int BPM = 120;
+    int CurrentStep = 0;
+    string[] pads = { 
+        "Bass", "Snare", "Hi Tom", "Mid Tom", "Low Tom", "Closed Hat", "Open Hat", "Clap"
+    };
+
+    protected async Task Start()
+    {
+        await hubConnection.SendAsync("StartSequencerAsync");
+    }
+
+    protected async Task Stop()
+    {
+        await hubConnection.SendAsync("StopSequencerAsync");
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(new Uri("http://localhost:4000/sequencerHub"))
+            .WithAutomaticReconnect(new TimeSpan[] {
+                TimeSpan.FromSeconds(0),
+                TimeSpan.FromSeconds(0),
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(8),
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(15),
+                TimeSpan.FromSeconds(30)
+            })
+            .Build();
+
+        hubConnection.On<int>("MovedToStep", async (step) => {
+            await JSRuntime.InvokeVoidAsync("moveToStep", step);
+        });
+
+        hubConnection.Reconnecting += (error) =>
+        {
+            connectionState = hubConnection.State.ToString();
+            StateHasChanged();
+            return Task.CompletedTask;
+        };
+
+        hubConnection.Reconnected += (connectionId) =>
+        {
+            connectionState = hubConnection.State.ToString();
+            StateHasChanged();
+            return Task.CompletedTask;
+        };
+
+        hubConnection.Closed += (error) =>
+        {
+            connectionState = hubConnection.State.ToString();
+            StateHasChanged();
+            return Task.CompletedTask;
+        };
+
+        await hubConnection.StartAsync().ContinueWith((o) => {
+            connectionState = hubConnection.State.ToString();
+            StateHasChanged();
+        });
+
+        await JSRuntime.InvokeVoidAsync("init", BPM);
+    }
+}

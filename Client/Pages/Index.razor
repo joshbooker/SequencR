@@ -67,14 +67,6 @@
     HubConnection hubConnection;
     string uri;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            await JSRuntime.InvokeVoidAsync("init", BPM);
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         uri = NavigationManager.ToAbsoluteUri("/sequencrHub").ToString();
@@ -94,6 +86,8 @@
 */ 
 
         //await hubConnection.StartAsync();
+
+        await JSRuntime.InvokeVoidAsync("init", BPM);
     }
 
     protected async Task Start()
