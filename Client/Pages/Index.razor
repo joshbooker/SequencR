@@ -65,10 +65,12 @@
                             Instruments
                         </div>
                         <ul class="list-group list-group-flush">
-                            @foreach (var pad in pads)
+                            @for (int index = 0; index < pads.Length; index++)
                             {
                                 <li class="list-group-item">
-                                    <button type="button" class="btn btn-secondary btn-instrument">@pad</button>
+                                    <button type="button"
+                                            class="btn btn-secondary btn-instrument"
+                                            onclick="@sounds[index]">@pads[index]</button>
                                 </li>
                             }
                         </ul>
@@ -85,7 +87,24 @@
     int BPM = 120;
     int CurrentStep = 0;
     string[] pads = {
-        "Bass", "Snare", "Hi Tom", "Mid Tom", "Low Tom", "Closed Hat", "Open Hat", "Clap"
+        "Bass", 
+        "Snare", 
+        "Hi Tom", 
+        "Mid Tom", 
+        "Low Tom", 
+        "Closed Hat", 
+        "Open Hat", 
+        "Clap"
+    };
+    string[] sounds = {
+        "sound.playBass()",
+        "sound.playSnare()",
+        "sound.playHiTom()",
+        "sound.playMidTom()",
+        "sound.playLoTom()",
+        "sound.playClosed()",
+        "sound.playOpen()",
+        "sound.playClap()",
     };
 
     DotNetObjectReference<BpmHelper> dotNetObject;
