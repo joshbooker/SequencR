@@ -16,4 +16,10 @@
     <ProjectReference Include="..\Shared\SequencR.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Infrastructure\ExampleJsInterop.cs" />
+  </ItemGroup>
 </Project>

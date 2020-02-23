@@ -1,12 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SequencR.Workers;
-using System.Linq;
+using SequencR.Server.Hubs;
 
-namespace SequencR.Server
+namespace SignalRServer
 {
     public class Startup
     {
@@ -14,35 +18,34 @@ namespace SequencR.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
-            services.AddResponseCompression(opts =>
+            services.AddCors(corsOptions =>
             {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
+                corsOptions.AddPolicy("cors", builder =>
+                {
+                    builder.WithOrigins("http://localhost:5002");
+                    builder.WithHeaders("*");
+                    builder.WithMethods("*");
+                });
             });
-            services.AddHostedService<SequenceWorker>();
+
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseResponseCompression();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBlazorDebugging();
             }
 
-            app.UseStaticFiles();
-            app.UseClientSideBlazorFiles<Client.Program>();
+            app.UseCors("cors");
 
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
-                endpoints.MapFallbackToClientSideBlazor<Client.Program>("index.html");
+                endpoints.MapHub<SequencerHub>("/sequencerHub");
             });
         }
     }
