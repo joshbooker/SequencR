@@ -22,7 +22,7 @@ namespace SignalRServer
             {
                 corsOptions.AddPolicy("cors", builder =>
                 {
-                    builder.WithOrigins("http://localhost:5002");
+                    builder.WithOrigins("http://localhost:5000");
                     builder.WithHeaders("*");
                     builder.WithMethods("*");
                 });

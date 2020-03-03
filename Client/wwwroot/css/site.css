@@ -1,6 +1,6 @@
 ﻿/* custom */
 .btn-instrument {
-    width: 120px;
+    min-width: 120px;
 }
 
 .card-controls {
@@ -9,6 +9,10 @@
 
 .card-step {
     width: 80px;
+}
+
+.card-instruments {
+    min-width: 150px;
 }
 
 /* built-in */

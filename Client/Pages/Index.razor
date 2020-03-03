@@ -5,15 +5,14 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<div class="main">
+<div class="container-fluid">
     <div class="top-row px-4">
         <strong>SequencR</strong>
         <span style="padding-left: 10px;">@connectionState</span>
         <span style="padding-left: 10px;">@CurrentStep</span>
     </div>
-
-    <div class="content">
-        <div class="card-deck">
+    <div class="row">
+        <div class="col">
             <div class="card text-center card-controls">
                 <div class="card-header">
                     Controls
@@ -24,13 +23,13 @@
                     </li>
                     <li class="list-group-item">
                         <input type="text" class="dial"
-                               @bind-value="@BPM"
-                               @bind-value:event="oninput"
-                               data-min="50"
-                               data-max="250"
-                               data-displayInput="true"
-                               data-width="120"
-                               data-thickness=".2">
+                                @bind-value="@BPM"
+                                @bind-value:event="oninput"
+                                data-min="50"
+                                data-max="250"
+                                data-displayInput="true"
+                                data-width="120"
+                                data-thickness=".2">
                     </li>
                     <li class="list-group-item">
                         <button type="button" class="btn btn-success" @onclick="Start">Start</button>
@@ -40,43 +39,43 @@
                     </li>
                 </ul>
             </div>
-            @for (int step = 0; step < 9; step++)
-            {
-                if (step > 0)
+        </div>
+        <div class="col">
+            <div class="card text-center card-instrument">
+                <div class="card-header">
+                    Instruments
+                </div>
+                <ul class="list-group list-group-flush">
+                    @for (int index = 0; index < pads.Length; index++)
+                    {
+                        <li class="list-group-item">
+                            <button type="button"
+                                    class="btn btn-secondary btn-instrument"
+                                    onclick="@sounds[index]">@pads[index]</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="card-deck">
+                @for (int step = 1; step < 9; step++)
                 {
-                    <div class="card text-center card-step" data-step="@step">
-                        <div class="card-header">
-                            @step
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            @foreach (var pad in pads)
-                            {
-                                <li class="list-group-item">
-                                    <button type="button" class="btn btn-secondary">Off</button>
-                                </li>
-                            }
-                        </ul>
+                <div class="card text-center card-step" data-step="@step">
+                    <div class="card-header">
+                        @step
                     </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var pad in pads)
+                        {
+                            <li class="list-group-item">
+                                <button type="button" class="btn btn-secondary">Off</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
                 }
-                else
-                {
-                    <div class="card text-center">
-                        <div class="card-header">
-                            Instruments
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            @for (int index = 0; index < pads.Length; index++)
-                            {
-                                <li class="list-group-item">
-                                    <button type="button"
-                                            class="btn btn-secondary btn-instrument"
-                                            onclick="@sounds[index]">@pads[index]</button>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                }
-            }
+            </div>
         </div>
     </div>
 </div>

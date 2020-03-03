@@ -61,7 +61,7 @@ namespace SequencR.Workers
 
         private void AdjustDelay()
         {
-            Delay = 60000 / BPM;
+            Delay = (60000 / BPM) / 4; // making an assumption we'll be at 4/4 most times here
             Timer?.Change(TimeSpan.FromMilliseconds(Delay), TimeSpan.Zero);
         } 
 
