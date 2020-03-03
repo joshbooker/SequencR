@@ -49,9 +49,7 @@
                     @for (int index = 0; index < pads.Length; index++)
                     {
                         <li class="list-group-item">
-                            <button type="button"
-                                    class="btn btn-secondary btn-instrument"
-                                    onclick="@sounds[index]">@pads[index]</button>
+                            <button type="button" class="btn btn-secondary btn-instrument">@pads[index]</button>
                         </li>
                     }
                 </ul>
@@ -95,27 +93,17 @@
         "Open Hat", 
         "Clap"
     };
-    string[] sounds = {
-        "sound.playBass()",
-        "sound.playSnare()",
-        "sound.playHiTom()",
-        "sound.playMidTom()",
-        "sound.playLoTom()",
-        "sound.playClosed()",
-        "sound.playOpen()",
-        "sound.playClap()",
-    };
 
     DotNetObjectReference<BpmHelper> dotNetObject;
 
     protected async Task Start()
     {
-        await hubConnection.SendAsync("StartSequencerAsync");
+        await hubConnection.InvokeAsync("StartSequencerAsync");
     }
 
     protected async Task Stop()
     {
-        await hubConnection.SendAsync("StopSequencerAsync");
+        await hubConnection.InvokeAsync("StopSequencerAsync");
     }
 
     protected async override Task OnInitializedAsync()
@@ -133,6 +121,16 @@
                 })
             .Build();
 
+        hubConnection.On("Initializing", async () =>
+        {
+            await JSRuntime.InvokeVoidAsync("log", "Initializing");
+        });
+
+        hubConnection.On("Initialized", async () =>
+        {
+            await JSRuntime.InvokeVoidAsync("log", "Initialized");
+        });
+
         hubConnection.On<int>("MovedToStep", async (step) =>
         {
             await JSRuntime.InvokeVoidAsync("moveToStep", step);
@@ -142,6 +140,14 @@
         {
             BPM = bpm;
             StateHasChanged();
+        });
+
+        hubConnection.On<string[]>("SoundsObtained", async (files) =>
+        {
+            foreach (var file in files)
+            {
+                await JSRuntime.InvokeVoidAsync("log", file);
+            }
         });
 
         hubConnection.Reconnecting += (error) =>
@@ -165,13 +171,16 @@
             return Task.CompletedTask;
         };
 
-        await hubConnection.StartAsync().ContinueWith((o) =>
+        await hubConnection.StartAsync().ContinueWith(async (o) =>
         {
             connectionState = hubConnection.State.ToString();
+            if(hubConnection.State == HubConnectionState.Connected)
+            {
+                await JSRuntime.InvokeVoidAsync("init", BPM);
+                await hubConnection.InvokeAsync("Init");
+            }
             StateHasChanged();
         });
-
-        await JSRuntime.InvokeVoidAsync("init", BPM);
 
         dotNetObject =
             DotNetObjectReference.Create(new BpmHelper(hubConnection));

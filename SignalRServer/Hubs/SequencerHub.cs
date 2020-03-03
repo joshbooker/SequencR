@@ -1,19 +1,43 @@
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using SequencR.Shared;
 
 namespace SequencR.Server.Hubs
 {
     public class SequencerHub : Hub
     {
-        public SequencerHub(ILogger<SequencerHub> logger)
+        public SequencerHub(ILogger<SequencerHub> logger, 
+            IWebHostEnvironment hostingEnvironment)
         {
             Logger = logger;
+            HostingEnvironment = hostingEnvironment;
+            Sequence = new Sequence();
         }
 
         public int BPM { get; set; } = 120;
         public ILogger<SequencerHub> Logger { get; }
+        public IWebHostEnvironment HostingEnvironment { get; }
+        public Sequence Sequence { get; set; }
+
+        public async Task Init()
+        {
+            await Clients.All.SendAsync("Initializing");
+
+            // todo: eventually support sound packs, like sub-folders here
+            var webrootpath = HostingEnvironment.WebRootPath;
+            var root = Path.Combine(webrootpath, "Media", "909");
+            var directory = new DirectoryInfo(root);
+            var files = directory.GetFiles().Select(x => x.Name);
+
+            await Clients.All.SendAsync("SoundsObtained", files);
+
+            await Clients.All.SendAsync("Initialized");
+        }
 
         public async Task Advance(int currentStep)
         {
