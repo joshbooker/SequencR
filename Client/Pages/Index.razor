@@ -46,10 +46,10 @@
                     Instruments
                 </div>
                 <ul class="list-group list-group-flush">
-                    @for (int index = 0; index < pads.Length; index++)
+                    @for (int index = 0; index < Samples.Count; index++)
                     {
                         <li class="list-group-item">
-                            <button type="button" class="btn btn-secondary btn-instrument">@pads[index]</button>
+                            <button type="button" class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Samples[index])</button>
                         </li>
                     }
                 </ul>
@@ -64,7 +64,7 @@
                         @step
                     </div>
                     <ul class="list-group list-group-flush">
-                        @foreach (var pad in pads)
+                        @foreach (var sample in Samples)
                         {
                             <li class="list-group-item">
                                 <button type="button" class="btn btn-secondary">Off</button>
@@ -83,17 +83,7 @@
     string connectionState = "Disconnected";
     int BPM = 120;
     int CurrentStep = 0;
-    string[] pads = {
-        "Bass", 
-        "Snare", 
-        "Hi Tom", 
-        "Mid Tom", 
-        "Low Tom", 
-        "Closed Hat", 
-        "Open Hat", 
-        "Clap"
-    };
-
+    public List<string> Samples { get; set; } = new List<string>();
     DotNetObjectReference<BpmHelper> dotNetObject;
 
     protected async Task Start()
@@ -121,16 +111,6 @@
                 })
             .Build();
 
-        hubConnection.On("Initializing", async () =>
-        {
-            await JSRuntime.InvokeVoidAsync("log", "Initializing");
-        });
-
-        hubConnection.On("Initialized", async () =>
-        {
-            await JSRuntime.InvokeVoidAsync("log", "Initialized");
-        });
-
         hubConnection.On<int>("MovedToStep", async (step) =>
         {
             await JSRuntime.InvokeVoidAsync("moveToStep", step);
@@ -147,7 +127,9 @@
             foreach (var file in files)
             {
                 await JSRuntime.InvokeVoidAsync("log", file);
+                Samples.Add(file);
             }
+            StateHasChanged();
         });
 
         hubConnection.Reconnecting += (error) =>

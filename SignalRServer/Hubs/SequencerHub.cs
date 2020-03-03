@@ -26,17 +26,13 @@ namespace SequencR.Server.Hubs
 
         public async Task Init()
         {
-            await Clients.All.SendAsync("Initializing");
-
             // todo: eventually support sound packs, like sub-folders here
             var webrootpath = HostingEnvironment.WebRootPath;
             var root = Path.Combine(webrootpath, "Media", "909");
             var directory = new DirectoryInfo(root);
             var files = directory.GetFiles().Select(x => x.Name);
 
-            await Clients.All.SendAsync("SoundsObtained", files);
-
-            await Clients.All.SendAsync("Initialized");
+            await Clients.Caller.SendAsync("SoundsObtained", files);
         }
 
         public async Task Advance(int currentStep)
