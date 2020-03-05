@@ -32,6 +32,24 @@
                                 data-thickness=".2">
                     </li>
                     <li class="list-group-item">
+                        <div class="card card-controls">
+                            <div class="card-header">
+                                Instruments
+                            </div>
+                            <div class="card-body">
+                                <select id="availableInstrumentMenu" value="@selectedSample" @onchange="SampleSelectionChanged">
+                                    @foreach (var instrument in AvailableSamples)
+                                    {
+                                    <option>@instrument</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="card-footer">
+                                <button type="button" class="btn btn-success" @onclick="AddInstrument">Add Instrument</button>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
                         <button type="button" class="btn btn-success" @onclick="Start">Start</button>
                     </li>
                     <li class="list-group-item">
@@ -81,9 +99,11 @@
 @code {
     HubConnection hubConnection;
     string connectionState = "Disconnected";
+    string selectedSample;
     int BPM = 120;
     int CurrentStep = 0;
     public List<string> Samples { get; set; } = new List<string>();
+    public List<string> AvailableSamples { get; set; } = new List<string>();
     DotNetObjectReference<BpmHelper> dotNetObject;
 
     protected async Task Start()
@@ -94,6 +114,20 @@
     protected async Task Stop()
     {
         await hubConnection.InvokeAsync("StopSequencerAsync");
+    }
+
+    protected void AddInstrument()
+    {
+        AvailableSamples.Remove(selectedSample);
+        Samples.Add(selectedSample);
+        selectedSample = AvailableSamples.FirstOrDefault();
+        StateHasChanged();
+    }
+
+    protected async Task SampleSelectionChanged(ChangeEventArgs e)
+    {
+        selectedSample = (string)e.Value;
+        StateHasChanged();
     }
 
     protected async override Task OnInitializedAsync()
@@ -127,8 +161,10 @@
             foreach (var file in files)
             {
                 await JSRuntime.InvokeVoidAsync("log", file);
-                Samples.Add(file);
+                AvailableSamples.Add(file);
             }
+
+            selectedSample = files.First();
             StateHasChanged();
         });
 

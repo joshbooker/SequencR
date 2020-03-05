@@ -4,7 +4,7 @@
 }
 
 .card-controls {
-    width: 200px;
+    min-width: 200px;
 }
 
 .card-step {
