@@ -67,7 +67,7 @@
                     @for (int index = 0; index < Samples.Count; index++)
                     {
                         <li class="list-group-item">
-                            <button type="button" class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Samples[index])</button>
+                            <button type="button" onclick="playSound('@Samples[index]')" class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Samples[index])</button>
                         </li>
                     }
                 </ul>
@@ -125,7 +125,7 @@
         StateHasChanged();
     }
 
-    protected async Task SampleSelectionChanged(ChangeEventArgs e)
+    protected void SampleSelectionChanged(ChangeEventArgs e)
     {
         selectedSample = (string)e.Value;
         StateHasChanged();

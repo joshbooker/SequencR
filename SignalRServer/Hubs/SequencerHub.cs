@@ -28,8 +28,8 @@ namespace SequencR.Server.Hubs
         public async Task Init()
         {
             // todo: eventually support sound packs, like sub-folders here
-            var webrootpath = HostingEnvironment.ContentRootPath;
-            var root = Path.Combine(webrootpath, "Media", "909");
+            var webrootpath = HostingEnvironment.WebRootPath;
+            var root = Path.Combine(webrootpath, "media", "909");
             var directory = new DirectoryInfo(root);
             var files = directory.GetFiles().Select(x => x.Name).ToArray();
             Array.Sort(files, StringComparer.InvariantCulture);

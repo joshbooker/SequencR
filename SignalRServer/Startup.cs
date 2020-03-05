@@ -40,6 +40,8 @@ namespace SignalRServer
             }
 
             app.UseCors("cors");
+            
+            app.UseStaticFiles();
 
             app.UseRouting();
 
