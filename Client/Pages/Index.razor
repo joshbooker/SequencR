@@ -97,6 +97,7 @@
 </div>
 
 @code {
+    string baseUrl = "http://localhost:4000/";
     HubConnection hubConnection;
     string connectionState = "Disconnected";
     string selectedSample;
@@ -132,8 +133,10 @@
 
     protected async override Task OnInitializedAsync()
     {
+        var hubUrl = string.Concat(baseUrl,"sequencerHub");
+        Console.WriteLine(hubUrl);
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri("http://localhost:4000/sequencerHub"))
+            .WithUrl(new Uri(hubUrl))
             .WithAutomaticReconnect(new TimeSpan[] {
                 TimeSpan.FromSeconds(0),
                 TimeSpan.FromSeconds(0),
@@ -160,7 +163,6 @@
         {
             foreach (var file in files)
             {
-                await JSRuntime.InvokeVoidAsync("log", file);
                 AvailableSamples.Add(file);
             }
 
