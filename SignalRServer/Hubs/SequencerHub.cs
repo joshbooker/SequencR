@@ -40,28 +40,26 @@ namespace SequencR.Server.Hubs
         public async Task Advance(int currentStep)
         {
             await Clients.All.SendAsync("MovedToStep", currentStep);
-            Logger.LogInformation($"MovedToStep: {currentStep}");
         }
 
         public async Task StartSequencerAsync()
         {
-            Logger.LogInformation("Starting");
             await Clients.All.SendAsync("Started");
-            Logger.LogInformation("Started");
         }
 
         public async Task StopSequencerAsync()
         {
-            Logger.LogInformation("Stopping");
             await Clients.All.SendAsync("Stopped");
-            Logger.LogInformation("Stopped");
         }
 
         public async Task ChangeBpm(int bpm)
         {
-            Logger.LogInformation($"Changing BPM to {bpm}");
             await Clients.All.SendAsync("BpmSet", bpm);
-            Logger.LogInformation($"Changed BPM to {bpm}");
+        }
+
+        public async Task AddInstrumentToSequence(string sample)
+        {
+            await Clients.Others.SendAsync("InstrumentAddedToSequence", sample);
         }
     }
 }

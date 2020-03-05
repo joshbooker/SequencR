@@ -45,7 +45,7 @@
                                 </select>
                             </div>
                             <div class="card-footer">
-                                <button type="button" class="btn btn-success" @onclick="AddInstrument">Add Instrument</button>
+                                <button type="button" class="btn btn-success" @onclick="OnAddInstrumentClicked">Add Instrument</button>
                             </div>
                         </div>
                     </li>
@@ -85,7 +85,11 @@
                         @foreach (var sample in Samples)
                         {
                             <li class="list-group-item">
-                                <button type="button" class="btn btn-secondary">Off</button>
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-primary">
+                                        <input type="checkbox" autocomplete="off"> Checked
+                                    </label>
+                                </div>
                             </li>
                         }
                     </ul>
@@ -117,12 +121,18 @@
         await hubConnection.InvokeAsync("StopSequencerAsync");
     }
 
+    protected void OnAddInstrumentClicked()
+    {
+        AddInstrument();
+        StateHasChanged();
+        hubConnection.InvokeAsync("AddInstrumentToSequence", selectedSample);
+    }
+
     protected void AddInstrument()
     {
         AvailableSamples.Remove(selectedSample);
         Samples.Add(selectedSample);
         selectedSample = AvailableSamples.FirstOrDefault();
-        StateHasChanged();
     }
 
     protected void SampleSelectionChanged(ChangeEventArgs e)
@@ -133,10 +143,10 @@
 
     protected async override Task OnInitializedAsync()
     {
-        var hubUrl = string.Concat(baseUrl,"sequencerHub");
-        Console.WriteLine(hubUrl);
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(new Uri(hubUrl))
+            .WithUrl(new Uri(
+                string.Concat(baseUrl,"sequencerHub")
+            ))
             .WithAutomaticReconnect(new TimeSpan[] {
                 TimeSpan.FromSeconds(0),
                 TimeSpan.FromSeconds(0),
@@ -167,6 +177,13 @@
             }
 
             selectedSample = files.First();
+            StateHasChanged();
+        });
+
+        hubConnection.On<string>("InstrumentAddedToSequence", (sample) =>
+        {
+            selectedSample = sample;
+            AddInstrument();
             StateHasChanged();
         });
 
