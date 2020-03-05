@@ -14,7 +14,7 @@ function log(target) {
 }
 
 function moveToStep(step) {
-    console.log('moveToStep ' + step);
+    // console.log('moveToStep ' + step);
     $('.card-step').removeClass('border-primary');
     $('.card-step').removeClass('bg-secondary');
     var stepCard = $('.card-step[data-step="' + step + '"]');
