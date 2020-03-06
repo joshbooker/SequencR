@@ -37,7 +37,9 @@
                                 Instruments
                             </div>
                             <div class="card-body">
-                                <select id="availableInstrumentMenu" value="@selectedSample" @onchange="SampleSelectionChanged">
+                                <select id="availableInstrumentMenu" 
+                                        value="@selectedSample" 
+                                        @onchange="SampleSelectionChanged">
                                     @foreach (var instrument in AvailableSamples)
                                     {
                                     <option>@instrument</option>
@@ -45,7 +47,9 @@
                                 </select>
                             </div>
                             <div class="card-footer">
-                                <button type="button" class="btn btn-success" @onclick="OnAddInstrumentClicked">Add Instrument</button>
+                                <button type="button" 
+                                        class="btn btn-success" 
+                                        @onclick="OnAddInstrumentClicked">Add Instrument</button>
                             </div>
                         </div>
                     </li>
@@ -75,22 +79,22 @@
         </div>
         <div class="col-9">
             <div class="card-deck">
-                @for (int step = 1; step < 9; step++)
+                @foreach (var step in Sequence.Steps)
                 {
                 <div class="card text-center card-step" data-step="@step">
                     <div class="card-header">
-                        @step
+                        @step.Index
                     </div>
                     <ul class="list-group list-group-flush">
-                        @foreach (var sample in Samples)
+                        @foreach (var sample in step.Trigs)
                         {
-                            <li class="list-group-item">
-                                <div class="btn-group-toggle" data-toggle="buttons">
-                                    <label class="btn btn-primary">
-                                        <input type="checkbox" autocomplete="off"> Checked
-                                    </label>
-                                </div>
-                            </li>
+                        <li class="list-group-item">
+                            <div class="btn-group-toggle" data-toggle="buttons">
+                                <label class="btn btn-primary">
+                                    <input type="checkbox" autocomplete="off"> Checked
+                                </label>
+                            </div>
+                        </li>
                         }
                     </ul>
                 </div>
@@ -110,6 +114,7 @@
     public List<string> Samples { get; set; } = new List<string>();
     public List<string> AvailableSamples { get; set; } = new List<string>();
     DotNetObjectReference<BpmHelper> dotNetObject;
+    Sequence Sequence { get; set; } = new Sequence();
 
     protected async Task Start()
     {
@@ -124,8 +129,8 @@
     protected void OnAddInstrumentClicked()
     {
         AddInstrument();
-        StateHasChanged();
         hubConnection.InvokeAsync("AddInstrumentToSequence", selectedSample);
+        StateHasChanged();
     }
 
     protected void AddInstrument()
@@ -180,10 +185,9 @@
             StateHasChanged();
         });
 
-        hubConnection.On<string>("InstrumentAddedToSequence", (sample) =>
+        hubConnection.On<Sequence>("SequenceReceived", (sequence) =>
         {
-            selectedSample = sample;
-            AddInstrument();
+            Sequence = sequence;
             StateHasChanged();
         });
 

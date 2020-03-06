@@ -25,16 +25,26 @@ namespace SequencR.Server.Hubs
         public IWebHostEnvironment HostingEnvironment { get; }
         public Sequence Sequence { get; set; }
 
-        public async Task Init()
+        private string[] GetSamples()
         {
-            // todo: eventually support sound packs, like sub-folders here
             var webrootpath = HostingEnvironment.WebRootPath;
             var root = Path.Combine(webrootpath, "media", "909");
             var directory = new DirectoryInfo(root);
             var files = directory.GetFiles().Select(x => x.Name).ToArray();
             Array.Sort(files, StringComparer.InvariantCulture);
+            return files;
+        }
 
+        public async Task Init()
+        {
+            // get the list of samples
+            var files = GetSamples();
+
+            // send the sample list to the client
             await Clients.Caller.SendAsync("SoundsObtained", files);
+
+            // send the sequence back to the client
+            await Clients.Caller.SendAsync("SequenceReceived", Sequence);
         }
 
         public async Task Advance(int currentStep)
@@ -59,7 +69,16 @@ namespace SequencR.Server.Hubs
 
         public async Task AddInstrumentToSequence(string sample)
         {
-            await Clients.Others.SendAsync("InstrumentAddedToSequence", sample);
+            Sequence.Samples.Add(sample);
+            
+            Sequence.Steps.ForEach(s => s.Trigs.Add(new Trig 
+            { 
+                IsArmed = false,
+                SampleFileName = sample
+            }));
+            
+            // send the sequence back to the client
+            await Clients.All.SendAsync("SequenceReceived", Sequence);
         }
     }
 }

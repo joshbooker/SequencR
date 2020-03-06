@@ -5,6 +5,11 @@ namespace SequencR.Shared
 {
     public class Step
     {
+        public Step(int index) : this()
+        {
+            Index = index;
+        }
+
         public Step()
         {
             this.Trigs = new List<Trig>();
