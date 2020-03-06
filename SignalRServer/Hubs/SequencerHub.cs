@@ -79,6 +79,24 @@ namespace SequencR.Server.Hubs
             await Clients.All.SendAsync("SequenceReceived", Sequence);
         }
 
+        public async Task ToggleTrigger(string sample, int step, bool isArmed)
+        {
+            lock(_lock)
+            {
+                // toggle the trigger for this sample & step
+                Sequence
+                    .Steps
+                    .First(x => x.Index == step)
+                        .Trigs
+                        .First(x => x.SampleFileName == sample)
+                            .IsArmed = isArmed;
+
+            }
+
+            // send the sequence back to the client
+            await Clients.All.SendAsync("SequenceReceived", Sequence);
+        }
+
         public async Task Advance(int currentStep)
         {
             await Clients.All.SendAsync("MovedToStep", currentStep);

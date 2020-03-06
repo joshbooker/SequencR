@@ -90,7 +90,7 @@
                         {
                         <li class="list-group-item trig-cell">
                             <label class="rocker rocker-small">
-                                <input type="checkbox" @bind="sample.IsArmed">
+                                <input type="checkbox" checked="@sample.IsArmed" @onchange="args => { OnTriggerToggled(sample.SampleFileName, step.Index, (bool)args.Value); } ">
                                 <span class="switch-left">On</span>
                                 <span class="switch-right">Off</span>
                             </label>
@@ -134,6 +134,11 @@
     {
         selectedSample = (string)e.Value;
         StateHasChanged();
+    }
+
+    protected void OnTriggerToggled(string sample, int step, bool isArmed)
+    {
+        hubConnection.InvokeAsync("ToggleTrigger", sample, step, isArmed);
     }
 
     protected async override Task OnInitializedAsync()
