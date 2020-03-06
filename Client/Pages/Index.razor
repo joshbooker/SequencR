@@ -70,7 +70,7 @@
                 <ul class="list-group list-group-flush">
                     @for (int index = 0; index < Sequence.SamplesInUse.Count; index++)
                     {
-                        <li class="list-group-item">
+                        <li class="list-group-item trig-cell">
                             <button type="button" onclick="playSound('@Sequence.SamplesInUse[index]')" class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Sequence.SamplesInUse[index])</button>
                         </li>
                     }
@@ -81,19 +81,19 @@
             <div class="card-deck">
                 @foreach (var step in Sequence.Steps)
                 {
-                <div class="card text-center card-step" data-step="@step">
+                <div class="card text-center card-step" data-step="@step.Index">
                     <div class="card-header">
                         @step.Index
                     </div>
                     <ul class="list-group list-group-flush">
                         @foreach (var sample in step.Trigs)
                         {
-                        <li class="list-group-item">
-                            <div class="btn-group-toggle" data-toggle="buttons">
-                                <label class="btn btn-primary">
-                                    <input type="checkbox" autocomplete="off"> Checked
-                                </label>
-                            </div>
+                        <li class="list-group-item trig-cell">
+                            <label class="rocker rocker-small">
+                                <input type="checkbox" @bind="sample.IsArmed">
+                                <span class="switch-left">On</span>
+                                <span class="switch-right">Off</span>
+                            </label>
                         </li>
                         }
                     </ul>
