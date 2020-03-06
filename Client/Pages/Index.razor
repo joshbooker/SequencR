@@ -92,7 +92,11 @@
                         {
                         <li class="list-group-item trig-cell">
                             <label class="rocker rocker-small">
-                                <input type="checkbox" checked="@sample.IsArmed" 
+                                <input type="checkbox" 
+                                       class="triggerToggle"
+                                       checked="@sample.IsArmed" 
+                                       data-sample="@sample.SampleFileName"
+                                       data-step="@step.Index"
                                        @onchange="args => { 
                                            OnTriggerToggled(sample.SampleFileName, 
                                                 step.Index, 

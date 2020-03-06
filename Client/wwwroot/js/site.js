@@ -12,12 +12,14 @@ function moveToStep(step) {
     var stepCard = $('.card-step[data-step="' + step + '"]');
     stepCard.addClass('border-primary');
     stepCard.addClass('bg-secondary');
+    $('.triggerToggle[data-step="' + step + '"]:checkbox:checked').each(function(index, value) {
+        playSound($(value).data('sample'));
+    });
 }
 
 function playSound(sample) {
     var baseUrl = 'http://localhost:4000/media/909/';
     var mediaUrl = baseUrl + sample;
-    console.log(mediaUrl);
     var sound = new Howl({
         src: [mediaUrl]
     });
