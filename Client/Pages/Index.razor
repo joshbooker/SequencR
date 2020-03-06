@@ -71,7 +71,9 @@
                     @for (int index = 0; index < Sequence.SamplesInUse.Count; index++)
                     {
                         <li class="list-group-item trig-cell">
-                            <button type="button" onclick="playSound('@Sequence.SamplesInUse[index]')" class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Sequence.SamplesInUse[index])</button>
+                            <button type="button" 
+                                    onclick="playSound('@Sequence.SamplesInUse[index]')" 
+                                    class="btn btn-secondary btn-instrument">@System.IO.Path.GetFileNameWithoutExtension(Sequence.SamplesInUse[index])</button>
                         </li>
                     }
                 </ul>
@@ -90,7 +92,12 @@
                         {
                         <li class="list-group-item trig-cell">
                             <label class="rocker rocker-small">
-                                <input type="checkbox" checked="@sample.IsArmed" @onchange="args => { OnTriggerToggled(sample.SampleFileName, step.Index, (bool)args.Value); } ">
+                                <input type="checkbox" checked="@sample.IsArmed" 
+                                       @onchange="args => { 
+                                           OnTriggerToggled(sample.SampleFileName, 
+                                                step.Index, 
+                                            (bool)args.Value); 
+                                        } ">
                                 <span class="switch-left">On</span>
                                 <span class="switch-right">Off</span>
                             </label>
@@ -215,7 +222,6 @@
             "bpmFunctions.wireUp",
             dotNetObject);
     }
-
     public void Dispose()
     {
         dotNetObject?.Dispose();
