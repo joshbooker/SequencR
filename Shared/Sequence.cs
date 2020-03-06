@@ -7,7 +7,8 @@ namespace SequencR.Shared
         public Sequence()
         {
             this.Steps = new List<Step>();
-            this.Samples = new List<string>();
+            this.AvailableSamples = new List<string>();
+            this.SamplesInUse = new List<string>();
 
             for (int i = 1; i < 9; i++)
             {
@@ -16,6 +17,7 @@ namespace SequencR.Shared
         }
 
         public List<Step> Steps { get; set; }
-        public List<string> Samples { get; set; }
+        public List<string> AvailableSamples { get; set; }
+        public List<string> SamplesInUse { get; set; }
     }
 }

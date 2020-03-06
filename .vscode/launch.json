@@ -20,6 +20,7 @@
             "program": "${workspaceFolder}/Server/bin/Debug/netcoreapp3.1/SequencR.Server.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Server",
+            "preLaunchTask": "build",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -36,6 +37,7 @@
             "name": "Launch Hub Server",
             "type": "coreclr",
             "request": "launch",
+            "preLaunchTask": "build",
             "program": "${workspaceFolder}/SignalRServer/bin/Debug/netcoreapp3.1/SignalRServer.dll",
             "args": [],
             "cwd": "${workspaceFolder}/SignalRServer",

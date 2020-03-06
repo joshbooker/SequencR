@@ -12,18 +12,23 @@ namespace SequencR.Server.Hubs
 {
     public class SequencerHub : Hub
     {
+        static SequencerHub()
+        {
+            Sequence = new Sequence();
+        }
+
         public SequencerHub(ILogger<SequencerHub> logger, 
             IWebHostEnvironment hostingEnvironment)
         {
             Logger = logger;
             HostingEnvironment = hostingEnvironment;
-            Sequence = new Sequence();
         }
 
         public int BPM { get; set; } = 120;
         public ILogger<SequencerHub> Logger { get; }
         public IWebHostEnvironment HostingEnvironment { get; }
-        public Sequence Sequence { get; set; }
+        static Sequence Sequence { get; set; }
+        static object _lock = new object();
 
         private string[] GetSamples()
         {
@@ -40,11 +45,38 @@ namespace SequencR.Server.Hubs
             // get the list of samples
             var files = GetSamples();
 
-            // send the sample list to the client
-            await Clients.Caller.SendAsync("SoundsObtained", files);
+            lock(_lock)
+            {
+                // if the sequence is new, initialize it with the files
+                if(Sequence.AvailableSamples.Count == 0 && Sequence.SamplesInUse.Count == 0)
+                {
+                    foreach (var file in files)
+                    {
+                        Sequence.AvailableSamples.Add(file);   
+                    }
+                }
+            }
 
             // send the sequence back to the client
             await Clients.Caller.SendAsync("SequenceReceived", Sequence);
+        }
+
+        public async Task AddInstrumentToSequence(string sample)
+        {
+            lock(_lock)
+            {
+                Sequence.AvailableSamples.Remove(sample);
+                Sequence.SamplesInUse.Add(sample);
+                
+                Sequence.Steps.ForEach(s => s.Trigs.Add(new Trig 
+                { 
+                    IsArmed = false,
+                    SampleFileName = sample
+                }));
+            }
+
+            // send the sequence back to the client
+            await Clients.All.SendAsync("SequenceReceived", Sequence);
         }
 
         public async Task Advance(int currentStep)
@@ -65,20 +97,6 @@ namespace SequencR.Server.Hubs
         public async Task ChangeBpm(int bpm)
         {
             await Clients.All.SendAsync("BpmSet", bpm);
-        }
-
-        public async Task AddInstrumentToSequence(string sample)
-        {
-            Sequence.Samples.Add(sample);
-            
-            Sequence.Steps.ForEach(s => s.Trigs.Add(new Trig 
-            { 
-                IsArmed = false,
-                SampleFileName = sample
-            }));
-            
-            // send the sequence back to the client
-            await Clients.All.SendAsync("SequenceReceived", Sequence);
         }
     }
 }
