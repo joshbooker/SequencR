@@ -3,6 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# JAB Files
+git_stuff.cmd
+# Server/Properties/
+# SignalRServer/Properties/
+
 # User-specific files
 *.suo
 *.user

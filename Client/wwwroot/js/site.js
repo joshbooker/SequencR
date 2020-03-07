@@ -18,7 +18,10 @@ function moveToStep(step) {
 }
 
 function playSound(sample) {
-    var baseUrl = 'http://localhost:4000/media/909/';
+    //test w multi-clients
+    var baseUrl = 'http://192.168.1.118:4000/media/909/';
+    //TO DO: perhaps get hubEndPoint and mediaPath via dotnetHelper
+    //var baseUrl = 'http://localhost:4000/media/909/';
     var mediaUrl = baseUrl + sample;
     var sound = new Howl({
         src: [mediaUrl]
